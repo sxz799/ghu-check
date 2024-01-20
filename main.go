@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/json"
 	"ghu-check/util"
-	"github.com/robfig/cron/v3"
+	"log"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/robfig/cron/v3"
 )
 
 func main() {
@@ -21,6 +23,10 @@ func CheckTokens() {
 	tokens := strings.Split(envVar, ",")
 	header := util.CopilotHeaders
 	var exp_tokens []string
+	if len(tokens) == 0 {
+		log.Println("未配置环境变量GHUS")
+		return
+	}
 	for _, token := range tokens {
 		header["Authorization"] = "token " + token
 		requestResult, err := util.SendHTTPRequest("GET", "https://api.github.com/copilot_internal/v2/token", header, nil)
