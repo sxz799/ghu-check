@@ -3,15 +3,16 @@ package main
 import (
 	"encoding/json"
 	"ghu-check/util"
+	"github.com/joho/godotenv"
+	"github.com/robfig/cron/v3"
 	"log"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/robfig/cron/v3"
 )
 
 func main() {
+	CheckTokens()
 	c := cron.New()
 	_, _ = c.AddFunc("@every 15min", CheckTokens)
 	c.Start()
@@ -19,10 +20,18 @@ func main() {
 }
 
 func CheckTokens() {
+	// 读取.env文件
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file")
+		return
+	}
 	envVar := os.Getenv("GHUS")
 	tokens := strings.Split(envVar, ",")
 	header := util.CopilotHeaders
 	var exp_tokens []string
+	log.Println("Tokens:", tokens)
 	if len(tokens) == 0 {
 		log.Println("未配置环境变量GHUS")
 		return
