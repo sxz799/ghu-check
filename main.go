@@ -3,25 +3,29 @@ package main
 import (
 	"encoding/json"
 	"ghu-check/util"
+	"github.com/robfig/cron/v3"
 	"os"
 	"strings"
 	"time"
 )
 
 func main() {
-	envVar := os.Getenv("GHUS")
-	strArray := strings.Split(envVar, ",")
-	CheckTokens(strArray)
+	c := cron.New()
+	_, _ = c.AddFunc("@every 15min", CheckTokens)
+	c.Start()
+	select {}
 }
 
-func CheckTokens(tokens []string) {
+func CheckTokens() {
+	envVar := os.Getenv("GHUS")
+	tokens := strings.Split(envVar, ",")
 	header := util.CopilotHeaders
 	var exp_tokens []string
 	for _, token := range tokens {
 		header["Authorization"] = "token " + token
 		requestResult, err := util.SendHTTPRequest("GET", "https://api.github.com/copilot_internal/v2/token", header, nil)
 		if err != nil {
-			util.SendBarkNotice("Token测试请求失败", "Token: "+token)
+			util.SendBarkNotice("Cocopilot-Token", "测试请求失败Token: "+token)
 			continue
 		}
 		var coToken CoToken
@@ -29,9 +33,10 @@ func CheckTokens(tokens []string) {
 		if coToken.ExpiresAt < time.Now().Unix() {
 			exp_tokens = append(exp_tokens, token)
 		}
+		time.Sleep(15 * time.Second)
 	}
 	//发送bark通知
-	util.SendBarkNotice("Token测试结果", "失效Token: "+strings.Join(exp_tokens, ","))
+	util.SendBarkNotice("Cocopilot-Token", "失效Token: "+strings.Join(exp_tokens, ","))
 }
 
 type CoToken struct {
