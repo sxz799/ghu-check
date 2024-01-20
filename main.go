@@ -14,7 +14,7 @@ import (
 func main() {
 	CheckTokens()
 	c := cron.New()
-	_, _ = c.AddFunc("@every 15min", CheckTokens)
+	_, _ = c.AddFunc("@every 15m", CheckTokens)
 	c.Start()
 	select {}
 }
