@@ -36,7 +36,9 @@ func CheckTokens() {
 		time.Sleep(15 * time.Second)
 	}
 	//发送bark通知
-	util.SendBarkNotice("Cocopilot-Token", "失效Token: "+strings.Join(exp_tokens, ","))
+	if len(exp_tokens) > 0 {
+		util.SendBarkNotice("Cocopilot-Token", "失效Token: "+strings.Join(exp_tokens, ","))
+	}
 }
 
 type CoToken struct {
