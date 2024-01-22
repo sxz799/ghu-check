@@ -65,6 +65,7 @@ func HandleResponseEncoding(resp *http.Response) []byte {
 	return responseData
 }
 
-func SendBarkNotice(title, content string) {
-	_, _ = SendHTTPRequest("GET", "http://182.43.242.4:7890/zxuNx7uD6Q2AtoJgSVmFqc"+"/"+title+"/"+content+"?icon=http://182.43.242.4:3000/dist/favicon.png", nil, nil)
+
+func SendBarkNotice(url,device_code,icon_url,title, content string) {
+	_, _ = SendHTTPRequest("GET", url+"/"+device_code+"/"+title+"/"+content+"?icon="+icon_url, nil, nil)
 }

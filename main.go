@@ -27,8 +27,9 @@ func CheckTokens() {
 		log.Println("Error loading .env file")
 		return
 	}
-	envVar := os.Getenv("GHUS")
-	tokens := strings.Split(envVar, ",")
+	url, device_code, icon_url := os.Getenv("BARK_URL"), os.Getenv("BARK_DEVICE_CODE"), os.Getenv("BARK_ICON_URL")
+	ghus := os.Getenv("GHUS")
+	tokens := strings.Split(ghus, ",")
 	header := util.CopilotHeaders
 	var exp_tokens []string
 	log.Println("Tokens:", tokens)
@@ -40,7 +41,7 @@ func CheckTokens() {
 		header["Authorization"] = "token " + token
 		requestResult, err := util.SendHTTPRequest("GET", "https://api.github.com/copilot_internal/v2/token", header, nil)
 		if err != nil {
-			util.SendBarkNotice("Cocopilot-Token", "测试请求失败Token: "+token)
+			util.SendBarkNotice(url, device_code, icon_url, "Cocopilot-Token", "测试请求失败Token: "+token)
 			continue
 		}
 		var coToken CoToken
@@ -52,7 +53,7 @@ func CheckTokens() {
 	}
 	//发送bark通知
 	if len(exp_tokens) > 0 {
-		util.SendBarkNotice("Cocopilot-Token", "失效Token: "+strings.Join(exp_tokens, ","))
+		util.SendBarkNotice(url, device_code, icon_url, "Cocopilot-Token", "失效Token: "+strings.Join(exp_tokens, ","))
 	}
 }
 
